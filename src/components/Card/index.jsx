@@ -12,7 +12,6 @@ const Card = ({
   if (typeof bodyFromProps === "string" || typeof bodyFromProps === "number") {
     body = bodyFromProps.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-    console.log('body', body);
   } else if (typeof body === "function") {
     body = bodyFromProps();
   }

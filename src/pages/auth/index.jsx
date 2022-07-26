@@ -13,7 +13,6 @@ const Auth = () => {
   const responseGoogle = (res) => {
     const { profileObj } = res;
     const { email, name, imageUrl, googleId } = profileObj;
-    console.log(email, name, imageUrl, res)
     setState({
       email, name, imageUrl, googleId
     })

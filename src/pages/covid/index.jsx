@@ -23,8 +23,6 @@ const Covid = Main => {
 
   const [form] = Form.useForm();
 
-  console.log('form', form.getFieldsValue());
-
   const [{ from, to }] = useSetState({
     from: null,
     to: null,
@@ -58,14 +56,9 @@ const Covid = Main => {
     })
   }
 
-  const handleChangeInput = (e) => {
-    console.log('handleChangeInput', e.target.value)
-  }
-
   const getDataChart = ({ slug, from, to, status = 'confirmed' }) => {
 
     axios.get(`https://api.covid19api.com/dayone/country/${slug}/status/${status}?from=${from}&to=${to}`).then(({ data }) => {
-      console.log('data', data);
       setState({
         dataChart: data
       })
@@ -75,7 +68,6 @@ const Covid = Main => {
   const handleSearchSelect = (textSearch) => {
     (textSearch) => {
       let temp = [...countries];
-      console.log('onSearch', temp);
       temp = temp.filter(el => {
         return el.Slug.toLowerCase().includes(textSearch.toLowerCase()) || el.Country.toLowerCase().includes(textSearch.toLowerCase());
       })
@@ -88,6 +80,15 @@ const Covid = Main => {
           countries: constCountry
         })
       }
+    }
+  }
+
+  const handleChangeValuesForm = (valueChange, allValues) => {
+    const { country, date, status } = allValues;
+    if (date && date !== "null" && country) {
+      const from = date[0];
+      const to = date[1];
+      getDataChart({ slug: country, from: moment(from).format('YYYY-MM-DD') + "T00:00:00.000Z", to: moment(to).format('YYYY-MM-DD') + "T00:00:00.000Z", status })
     }
   }
 
@@ -120,16 +121,8 @@ const Covid = Main => {
     <div className=' p-4 border mt-8'>
       <div className="text-16px my-6 mx-2" >
         <div className='mb-8 text-24px font-bold text-red-600'>Select field to display chart</div>
-        <Form form={form} onValuesChange={(valueChange, allValues) => {
-          console.log('allvalue,', allValues)
-          const { country, date, status } = allValues;
-          if (date && date !== "null" && country) {
-            const from = date[0];
-            const to = date[1];
-            getDataChart({ slug: country, from: moment(from).format('YYYY-MM-DD') + "T00:00:00.000Z", to: moment(to).format('YYYY-MM-DD') + "T00:00:00.000Z", status })
-          }
-        }}>
-          <Form.Item name="date">
+        <Form form={form} onValuesChange={handleChangeValuesForm}>
+          <Form.Item label="From - To" name="date">
             <RangePicker
               disabledDate={(current) => {
                 let customeDate = moment().format("YYYY-MM-DD");
@@ -137,7 +130,7 @@ const Covid = Main => {
               }}
               name="date" />
           </Form.Item>
-          <Form.Item name="country">
+          <Form.Item label="Country" name="country">
             <Select
               name="country"
               showSearch
@@ -154,7 +147,7 @@ const Covid = Main => {
               }
             </Select>
           </Form.Item>
-          <Form.Item name="status">
+          <Form.Item label="Status" name="status">
             <Select
               style={{
                 width: '100%',
